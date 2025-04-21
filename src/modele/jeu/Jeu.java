@@ -137,7 +137,7 @@ public class Jeu {
             }
         }
 
-        return true; //aucun coup ne sauve le roi
+        return true; //aucun coup ne sauve le roi,
     }
 
 
