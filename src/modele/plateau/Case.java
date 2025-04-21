@@ -11,6 +11,8 @@ public class Case {
 
     protected Piece p;
     protected Plateau plateau;
+    protected Case maCase;
+
 
 
 
@@ -18,6 +20,10 @@ public class Case {
         p = null;
     }
 
+
+    public boolean aPiece() {
+        return p != null;
+    }
 
 
     public Case(Plateau _plateau) {
@@ -34,5 +40,6 @@ public class Case {
         p = _e;
 
     }
+
 
    }

@@ -1,173 +1,157 @@
-package VueControleur;
+    package VueControleur;
 
-import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.image.BufferedImage;
-import java.util.Observable;
-import java.util.Observer;
-import javax.swing.*;
+    import java.awt.*;
+    import java.awt.event.MouseAdapter;
+    import java.awt.event.MouseEvent;
+    import java.util.ArrayList;
+    import javax.swing.*;
+    import java.util.*; // ou bien
+    import modele.plateau.*;
+    import VueControleur.VueControleur;
 
-import modele.jeu.Coup;
-import modele.jeu.Jeu;
-import modele.plateau.Case;
-import modele.jeu.Piece;
-import modele.jeu.Roi;
-import modele.jeu.Pion;
-import modele.jeu.Dame;
-import modele.jeu.Fou;
-import modele.jeu.Tour;
-import modele.jeu.Cheval;
-import modele.plateau.Plateau;
 
-public class VueControleur extends JFrame implements Observer {
-    private Plateau plateau;
-    private Jeu jeu;
-    private final int sizeX;
-    private final int sizeY;
-    private static final int pxCase = 50; // pixels par case
 
-    private ImageIcon icoRoiB, icoRoiN;
-    private ImageIcon icoPionB, icoPionN;
-    private ImageIcon icoDameB, icoDameN;
-    private ImageIcon icoFouB, icoFouN;
-    private ImageIcon icoTourB, icoTourN;
-    private ImageIcon icoChevalB, icoChevalN;
+    import modele.jeu.*;
+    import modele.plateau.*;
 
-    private Case caseClic1;
-    private Case caseClic2;
+    public class VueControleur extends JFrame implements Observer {
+        private static VueControleur instance;
 
-    private JLabel[][] tabJLabel;
+        private Plateau plateau;
+        private Jeu jeu;
+        private final int sizeX;
+        private final int sizeY;
+        private static final int pxCase = 50; // pixels par case
 
-    public VueControleur(Jeu _jeu) {
-        jeu = _jeu;
-        plateau = jeu.getPlateau();
-        sizeX = plateau.SIZE_X;
-        sizeY = plateau.SIZE_Y;
+        private ImageIcon icoRoiB, icoRoiN;
+        private ImageIcon icoPionB, icoPionN;
+        private ImageIcon icoDameB, icoDameN;
+        private ImageIcon icoFouB, icoFouN;
+        private ImageIcon icoTourB, icoTourN;
+        private ImageIcon icoChevalB, icoChevalN;
 
-        chargerLesIcones();
-        placerLesComposantsGraphiques();
+        private Case caseClic1;
+        private Case caseClic2;
 
-        plateau.addObserver(this);
+        private JLabel[][] tabJLabel;
+        private ArrayList<Case> casesSurbrillance = new ArrayList<>();
+        private Color couleurSurbrillance = new Color(236, 198, 151  ); // bleu clair transparent
+        private Color couleurClair = new Color(238, 238, 238);
+        private Color couleurFonce = new Color(125, 135, 150);
 
-        mettreAJourAffichage();
-    }
 
-    private void chargerLesIcones() {
-        icoRoiB = chargerIcone("Images/wK.png");
-        icoRoiN = chargerIcone("Images/bK.png");
-        icoPionB = chargerIcone("Images/wP.png");
-        icoPionN = chargerIcone("Images/bP.png");
-        icoDameB = chargerIcone("Images/wQ.png");
-        icoDameN = chargerIcone("Images/bQ.png");
-        icoFouB = chargerIcone("Images/wB.png");
-        icoFouN = chargerIcone("Images/bB.png");
-        icoTourB = chargerIcone("Images/wR.png");
-        icoTourN = chargerIcone("Images/bR.png");
-        icoChevalB = chargerIcone("Images/wN.png");
-        icoChevalN = chargerIcone("Images/bN.png");
-    }
+        public VueControleur(Jeu _jeu) {
+            instance = this;
+            jeu = _jeu;
+            plateau = jeu.getPlateau();
+            sizeX = Plateau.SIZE_X;
+            sizeY = Plateau.SIZE_Y;
 
-    private ImageIcon chargerIcone(String urlIcone) {
-        ImageIcon icon = new ImageIcon(urlIcone);
-        Image img = icon.getImage().getScaledInstance(pxCase, pxCase, Image.SCALE_SMOOTH);
-        return new ImageIcon(img);
-    }
+            chargerLesIcones();
+            placerLesComposantsGraphiques();
 
-    private void placerLesComposantsGraphiques() {
-        setTitle("Jeu d'Échecs");
-        setResizable(false);
-        setSize(sizeX * pxCase, sizeY * pxCase);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-        JComponent grilleJLabels = new JPanel(new GridLayout(sizeY, sizeX));
-        tabJLabel = new JLabel[sizeX][sizeY];
-
-        for (int y = 0; y < sizeY; y++) {
-            for (int x = 0; x < sizeX; x++) {
-                JLabel jlab = new JLabel();
-                tabJLabel[x][y] = jlab;
-
-                final int xx = x;
-                final int yy = y;
-
-                jlab.addMouseListener(new MouseAdapter() {
-                    @Override
-                    public void mouseClicked(MouseEvent e) {
-                        Case clic = plateau.getCases()[xx][yy];
-
-                        if (caseClic1 == null) {
-                            if (clic.getPiece() != null) {
-                                caseClic1 = clic;
-                            }
-                        } else {
-                            caseClic2 = clic;
-                            jeu.envoyerCoup(new Coup(caseClic1, caseClic2));
-                            caseClic1 = null;
-                            caseClic2 = null;
-                        }
-                    }
-                });
-
-                jlab.setOpaque(true);
-
-                if ((x + y) % 2 == 0) {
-                    jlab.setBackground(new Color(238, 238, 238)); // clair
-                } else {
-                    jlab.setBackground(new Color(125, 135, 150)); // foncé
-                }
-
-                grilleJLabels.add(jlab);
-            }
+            plateau.addObserver(this);
+            mettreAJourAffichage();
         }
-        add(grilleJLabels);
-    }
 
-    private void mettreAJourAffichage() {
-        for (int x = 0; x < sizeX; x++) {
+        private void chargerLesIcones() {
+            icoRoiB = chargerIcone("Images/wK.png");
+            icoRoiN = chargerIcone("Images/bK.png");
+            icoPionB = chargerIcone("Images/wP.png");
+            icoPionN = chargerIcone("Images/bP.png");
+            icoDameB = chargerIcone("Images/wQ.png");
+            icoDameN = chargerIcone("Images/bQ.png");
+            icoFouB = chargerIcone("Images/wB.png");
+            icoFouN = chargerIcone("Images/bB.png");
+            icoTourB = chargerIcone("Images/wR.png");
+            icoTourN = chargerIcone("Images/bR.png");
+            icoChevalB = chargerIcone("Images/wN.png");
+            icoChevalN = chargerIcone("Images/bN.png");
+        }
+
+        private ImageIcon chargerIcone(String urlIcone) {
+            ImageIcon icon = new ImageIcon(urlIcone);
+            Image img = icon.getImage().getScaledInstance(pxCase, pxCase, Image.SCALE_SMOOTH);
+            return new ImageIcon(img);
+        }
+
+        private void placerLesComposantsGraphiques() {
+            setTitle("Jeu d'Échecs");
+            setResizable(false);
+            setSize(sizeX * pxCase, sizeY * pxCase);
+            setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+            JComponent grilleJLabels = new JPanel(new GridLayout(sizeY, sizeX));
+            tabJLabel = new JLabel[sizeX][sizeY];
+
+
             for (int y = 0; y < sizeY; y++) {
-                Case c = plateau.getCases()[x][y];
+                for (int x = 0; x < sizeX; x++) {
+                    JLabel jlab = new JLabel();
+                    tabJLabel[x][y] = jlab;
 
-                if (c != null) {
+                    final int xx = x;
+                    final int yy = y;
+
+                    jlab.addMouseListener(new MouseAdapter() {
+                        @Override
+                        public void mouseClicked(MouseEvent e) {
+                            Case clic = plateau.getCases()[xx][yy];
+
+                            if (caseClic1 == null) {
+                                if (clic.getPiece() != null && clic.getPiece().getCouleur() == jeu.getJoueurCourant()) {
+                                    caseClic1 = clic;
+                                    afficherCasesAccessibles(clic);
+                                }
+                            } else {
+                                caseClic2 = clic;
+                                jeu.envoyerCoup(new Coup(caseClic1, caseClic2));
+                                caseClic1 = null;
+                                caseClic2 = null;
+                                casesSurbrillance.clear();
+                                remettreCouleursPlateau();
+                            }
+
+                        }
+                    });
+
+                    jlab.setOpaque(true);
+                    jlab.setHorizontalAlignment(SwingConstants.CENTER);
+                    jlab.setVerticalAlignment(SwingConstants.CENTER);
+
+                    if ((x + y) % 2 == 0) {
+                        jlab.setBackground(new Color(238, 238, 238)); // clair
+                    } else {
+                        jlab.setBackground(new Color(125, 135, 150)); // foncé
+                    }
+
+                    grilleJLabels.add(jlab);
+                }
+            }
+            add(grilleJLabels);
+        }
+
+        private void mettreAJourAffichage() {
+            for (int x = 0; x < sizeX; x++) {
+                for (int y = 0; y < sizeY; y++) {
+                    Case c = plateau.getCases()[x][y];
                     Piece e = c.getPiece();
 
                     if (e != null) {
+                        Couleur couleur = e.getCouleur();
+
                         if (e instanceof Roi) {
-                            if (y == 7) {
-                                tabJLabel[x][y].setIcon(icoRoiB);
-                            } else {
-                                tabJLabel[x][y].setIcon(icoRoiN);
-                            }
+                            tabJLabel[x][y].setIcon(couleur == Couleur.BLANC ? icoRoiB : icoRoiN);
                         } else if (e instanceof Pion) {
-                            if (y == 6) {
-                                tabJLabel[x][y].setIcon(icoPionB);
-                            } else if (y == 1) {
-                                tabJLabel[x][y].setIcon(icoPionN);
-                            }
+                            tabJLabel[x][y].setIcon(couleur == Couleur.BLANC ? icoPionB : icoPionN);
                         } else if (e instanceof Dame) {
-                            if (y == 7) {
-                                tabJLabel[x][y].setIcon(icoDameB);
-                            } else {
-                                tabJLabel[x][y].setIcon(icoDameN);
-                            }
+                            tabJLabel[x][y].setIcon(couleur == Couleur.BLANC ? icoDameB : icoDameN);
                         } else if (e instanceof Fou) {
-                            if (y == 7) {
-                                tabJLabel[x][y].setIcon(icoFouB);
-                            } else {
-                                tabJLabel[x][y].setIcon(icoFouN);
-                            }
+                            tabJLabel[x][y].setIcon(couleur == Couleur.BLANC ? icoFouB : icoFouN);
                         } else if (e instanceof Tour) {
-                            if (y == 7) {
-                                tabJLabel[x][y].setIcon(icoTourB);
-                            } else {
-                                tabJLabel[x][y].setIcon(icoTourN);
-                            }
+                            tabJLabel[x][y].setIcon(couleur == Couleur.BLANC ? icoTourB : icoTourN);
                         } else if (e instanceof Cheval) {
-                            if (y == 7) {
-                                tabJLabel[x][y].setIcon(icoChevalB);
-                            } else {
-                                tabJLabel[x][y].setIcon(icoChevalN);
-                            }
+                            tabJLabel[x][y].setIcon(couleur == Couleur.BLANC ? icoChevalB : icoChevalN);
                         }
                     } else {
                         tabJLabel[x][y].setIcon(null);
@@ -175,16 +159,40 @@ public class VueControleur extends JFrame implements Observer {
                 }
             }
         }
-    }
 
-    @Override
-    public void update(Observable o, Object arg) {
-        mettreAJourAffichage();
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                mettreAJourAffichage();
+        @Override
+        public void update(Observable o, Object arg) {
+            SwingUtilities.invokeLater(this::mettreAJourAffichage);
+        }
+        private void afficherCasesAccessibles(Case caseDepart) {
+            casesSurbrillance.clear();
+            remettreCouleursPlateau();
+
+            Piece p = caseDepart.getPiece();
+            if (p != null) {
+                ArrayList<Case> deplacements = p.getDeplacementsPossibles();
+                casesSurbrillance.addAll(deplacements);
+
+                for (Case c : deplacements) {
+                    Point pos = plateau.getMap().get(c);
+                    if (pos != null) {
+                        tabJLabel[pos.x][pos.y].setBackground(couleurSurbrillance);
+                    }
+                }
             }
-        });
+        }
+        private void remettreCouleursPlateau() {
+            for (int x = 0; x < sizeX; x++) {
+                for (int y = 0; y < sizeY; y++) {
+                    if ((x + y) % 2 == 0) {
+                        tabJLabel[x][y].setBackground(couleurClair);
+                    } else {
+                        tabJLabel[x][y].setBackground(couleurFonce);
+                    }
+                }
+            }
+        }
+        public static VueControleur getInstance() {
+            return instance;
+        }
     }
-}

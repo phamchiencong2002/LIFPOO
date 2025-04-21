@@ -5,8 +5,17 @@ import modele.plateau.Case;
 public class Coup {
     protected Case dep;
     protected Case arr;
+
     public Coup(Case _dep, Case _arr) {
         dep = _dep;
         arr = _arr;
+    }
+
+    public Case getCaseDepart() {
+        return dep;
+    }
+
+    public Case getCaseArrivee() {
+        return arr;
     }
 }

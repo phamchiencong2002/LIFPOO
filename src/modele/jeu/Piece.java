@@ -1,6 +1,12 @@
 package modele.jeu;
 
-import modele.plateau.*;
+import modele.plateau.Case;
+import modele.plateau.Plateau;
+import modele.plateau.DecorateurCasesAccessibles;
+
+import java.awt.Point;
+import java.util.ArrayList;
+
 
 public abstract class Piece {
     protected Plateau plateau;
@@ -8,8 +14,8 @@ public abstract class Piece {
     protected Case maCase;
     protected DecorateurCasesAccessibles casesAccessibles;
 
-    public Piece(Plateau p, Couleur couleur) {
-        plateau = p;
+    public Piece(Plateau plateau, Couleur couleur) {
+        this.plateau = plateau;
         this.couleur = couleur;
     }
 
@@ -21,11 +27,34 @@ public abstract class Piece {
         return maCase;
     }
 
+    public void setCase(Case c) {
+        this.maCase = c;
+    }
+
     public void allerSurCase(Case nouvelleCase) {
         if (maCase != null) {
-            maCase.quitterLaCase();     // <-- Important : quitter l'ancienne case proprement
+            maCase.quitterLaCase(); //on quitte la case
         }
-        nouvelleCase.setEntite(this);    // <-- Correct : setEntite (pas setPiece)
+
+        nouvelleCase.setEntite(this); //on atterit sur une nouvelle case
         maCase = nouvelleCase;
+
+        //promotion
+        if (this instanceof Pion) {
+            Point coord = plateau.getMap().get(maCase);
+            if (coord != null) {
+                int ligneFinale = (getCouleur() == Couleur.BLANC) ? 7 : 0;
+                if (coord.y == ligneFinale) {
+                    // 💫 Promotion en Dame
+                    System.out.println("promotion d’un pion en dame !");
+                    Piece dame = new Dame(plateau, getCouleur());
+                    dame.allerSurCase(maCase); //remplacer par une dame
+                }
+            }
+        }
     }
+
+
+    // ⚠️ obligatoire pour que @Override fonctionne dans les classes filles
+    public abstract ArrayList<Case> getDeplacementsPossibles();
 }

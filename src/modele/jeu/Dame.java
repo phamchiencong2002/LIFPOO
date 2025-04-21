@@ -1,9 +1,19 @@
 package modele.jeu;
 
 import modele.plateau.*;
+import java.util.ArrayList;
 
 public class Dame extends Piece {
-    public Dame(Plateau _plateau, Couleur couleur) {
-        super(_plateau, couleur);
+    public Dame(Plateau plateau, Couleur couleur) {
+        super(plateau, couleur);
+    }
+
+    @Override
+    public ArrayList<Case> getDeplacementsPossibles() {
+        DecorateurCasesAccessibles d = new DecorateurCasesEnDiagonale(
+                new DecorateurCasesEnLigne(null)
+        );
+        d.setContexte(plateau, this);
+        return d.getCasesPossibles();
     }
 }

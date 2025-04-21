@@ -1,9 +1,17 @@
 package modele.jeu;
 
 import modele.plateau.*;
+import java.util.ArrayList;
 
 public class Fou extends Piece {
-    public Fou(Plateau _plateau, Couleur couleur) {
-        super(_plateau, couleur);
+    public Fou(Plateau plateau, Couleur couleur) {
+        super(plateau, couleur);
+    }
+
+    @Override
+    public ArrayList<Case> getDeplacementsPossibles() {
+        DecorateurCasesAccessibles d = new DecorateurCasesEnDiagonale(null);
+        d.setContexte(plateau, this);
+        return d.getCasesPossibles();
     }
 }
