@@ -76,7 +76,7 @@
         }
 
         private void placerLesComposantsGraphiques() {
-            setTitle("Jeu d'Échecs");
+            setTitle("jeu d'Echecs");
             setResizable(false);
             setSize(sizeX * pxCase, sizeY * pxCase);
             setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
