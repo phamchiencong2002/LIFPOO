@@ -58,8 +58,7 @@ public class Jeu {
 
         String notation = genererNotationEchiquenne(piece, depart, arrivee, ancienneCible != null);
         historiqueCoups.add(notation);
-        afficherHistoriqueConsole(); // ← ici
-
+        afficherHistoriqueConsole();
         changerTour();
 
         if (estEnEchec(joueurCourant)) {
@@ -97,7 +96,8 @@ public class Jeu {
     private String genererNotationEchiquenne(Piece piece, Case depart, Case arrivee, boolean prise) {
         String nomPiece = getLettrePiece(piece);
         String arriveeStr = caseVersNotation(arrivee);
-        String sep = prise ? "x" : "-";
+        String sep = prise ? "x" : "";
+
 
         if (piece instanceof Pion && prise) {
             char col = (char) ('a' + plateau.getMap().get(depart).x);
@@ -201,7 +201,7 @@ public class Jeu {
             }
             pw.println(sb.toString().trim());
             pw.close();
-            System.out.println("Partie sauvegardée : " + fichier.getAbsolutePath());
+            System.out.println("partie sauvegardée : " + fichier.getAbsolutePath());
         } catch (IOException e) {
             e.printStackTrace();
         }
