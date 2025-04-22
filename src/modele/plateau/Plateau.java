@@ -12,6 +12,8 @@ import modele.jeu.Tour;
 import modele.jeu.Fou;
 import modele.jeu.Dame;
 import modele.jeu.Cheval;
+import modele.jeu.Jeu;
+
 
 public class Plateau extends Observable {
 
@@ -20,10 +22,18 @@ public class Plateau extends Observable {
 
     private HashMap<Case, Point> map = new HashMap<>(); // permet de récupérer la position d'une case à partir de sa référence
     private Case[][] grilleCases = new Case[SIZE_X][SIZE_Y]; // permet de récupérer une case à partir de ses coordonnées
+    private Jeu jeu;
 
-    public Plateau() {
+
+    public Plateau(Jeu jeu) {
+        this.jeu = jeu;
         initPlateauVide();
     }
+
+    public Jeu getJeu() {
+        return jeu;
+    }
+
 
     public Case[][] getCases() {
         return grilleCases;
@@ -39,34 +49,33 @@ public class Plateau extends Observable {
     }
 
     public void placerPieces() {
-        System.out.println("🔧 Placement des pièces :");
+        System.out.println("placement des pièces :");
 
-        //pieces blanches
         new Tour(this, Couleur.BLANC).allerSurCase(grilleCases[0][0]);
         new Cheval(this, Couleur.BLANC).allerSurCase(grilleCases[1][0]);
         new Fou(this, Couleur.BLANC).allerSurCase(grilleCases[2][0]);
-        new Roi(this, Couleur.BLANC).allerSurCase(grilleCases[3][0]);
-        new Dame(this, Couleur.BLANC).allerSurCase(grilleCases[4][0]);
+        new Dame(this, Couleur.BLANC).allerSurCase(grilleCases[3][0]);
+        new Roi(this, Couleur.BLANC).allerSurCase(grilleCases[4][0]);
         new Fou(this, Couleur.BLANC).allerSurCase(grilleCases[5][0]);
         new Cheval(this, Couleur.BLANC).allerSurCase(grilleCases[6][0]);
         new Tour(this, Couleur.BLANC).allerSurCase(grilleCases[7][0]);
 
-        //pions blancs
-        for (int x = 0; x < 8; x++) {
+// ♟ pions blancs
+        for (int x = 0; x < SIZE_X; x++) {
             new Pion(this, Couleur.BLANC).allerSurCase(grilleCases[x][1]);
         }
 
-        //pions noirs
-        for (int x = 0; x < 8; x++) {
+// ♟ pions noirs
+        for (int x = 0; x < SIZE_X; x++) {
             new Pion(this, Couleur.NOIR).allerSurCase(grilleCases[x][6]);
         }
 
-        //pieces en noirs
+// noirs
         new Tour(this, Couleur.NOIR).allerSurCase(grilleCases[0][7]);
         new Cheval(this, Couleur.NOIR).allerSurCase(grilleCases[1][7]);
         new Fou(this, Couleur.NOIR).allerSurCase(grilleCases[2][7]);
-        new Roi(this, Couleur.NOIR).allerSurCase(grilleCases[3][7]);
-        new Dame(this, Couleur.NOIR).allerSurCase(grilleCases[4][7]);
+        new Dame(this, Couleur.NOIR).allerSurCase(grilleCases[3][7]);
+        new Roi(this, Couleur.NOIR).allerSurCase(grilleCases[4][7]);
         new Fou(this, Couleur.NOIR).allerSurCase(grilleCases[5][7]);
         new Cheval(this, Couleur.NOIR).allerSurCase(grilleCases[6][7]);
         new Tour(this, Couleur.NOIR).allerSurCase(grilleCases[7][7]);
@@ -74,13 +83,13 @@ public class Plateau extends Observable {
         setChanged();
         notifyObservers();
 
-        System.out.println("📦 Grille des pièces :");
+        System.out.println(" Grille des pièces :");
         for (int x = 0; x < SIZE_X; x++) {
             for (int y = 0; y < SIZE_Y; y++) {
                 Case c = grilleCases[x][y];
                 Piece p = c.getPiece();
                 if (p != null) {
-                    System.out.println("🔹 " + p.getClass().getSimpleName() + " (" + p.getCouleur() + ") en [" + x + "," + y + "]");
+                    System.out.println("" + p.getClass().getSimpleName() + " (" + p.getCouleur() + ") en [" + x + "," + y + "]");
                 }
             }
         }
